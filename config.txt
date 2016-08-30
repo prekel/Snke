@@ -1,1 +1,1 @@
-40 11 5 2 1 400 25 0 O $ default.map
+40 11 5 2 1 250 25 0 O 0 $ default.map

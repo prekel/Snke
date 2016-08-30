@@ -10,8 +10,8 @@
 
 using namespace std;
 
-int a[25][80], i, j, x, y, X, Y, w, q, dir, f, n, m, c, l, C, h, t, g, brk, u, v, e[25][80], r, o, bf, N, M, s, k, sm, F, z[25][80], slp, slpf, slps;
-char b, head, eat, d, p[50];
+int a[25][80], i, j, x, y, X, Y, w, q, dir, f, n, m, c, l, C, h, t, g, brk, u, v, e[25][80], r, o, bf, N, M, s, k, sm, F, z[25][80], slp, slpf, slps, ps, MaX, E[25][80], I, J, O, R, K;
+char b, head, eat, d, p[100], pshead;
 string map, alf;
 ifstream config, conf, high, dmp, mp, fmp;
 ofstream out;
@@ -30,6 +30,26 @@ void buffersize(int x, int y)
 	size.X = x;
 	size.Y = y;
 	SetConsoleScreenBufferSize(GetStdHandle(STD_OUTPUT_HANDLE), size);
+}
+
+string itostring(int a)
+{
+	char c[15];
+	sprintf(c, "%d", a);
+	return string(c);
+}
+
+void windowsize(int x, int y)
+{
+	buffersize(x, y);
+	string S = "mode con cols=" + itostring(x) + " lines=" + itostring(y);
+	strcpy(p, S.c_str());
+	system(p);
+}
+
+void pause()
+{
+	while (!_kbhit());
 }
 
 void zero(int a)
@@ -57,13 +77,17 @@ void voln()
 			for (j = 0; j < 80; j++)
 				if (e[i][j] == o - 1)
 				{
-					if (e[i][j + 1] == 0 && (a[i][j + 1] == 0 || a[i][j + 1] - u + o - 3 - c > 0 && a[i][j + 1] > 0))
+					if (e[i][j + 1] == 0 && (a[i][j + 1] == 0 ||
+											 a[i][j + 1] - u + o - 3 - c > 0 && a[i][j + 1] > 0))
 						e[i][j + 1] = o;
-					if (e[i][j - 1] == 0 && (a[i][j - 1] == 0 || a[i][j - 1] - u + o - 3 - c > 0 && a[i][j - 1] > 0))
+					if (e[i][j - 1] == 0 && (a[i][j - 1] == 0 ||
+											 a[i][j - 1] - u + o - 3 - c > 0 && a[i][j - 1] > 0))
 						e[i][j - 1] = o;
-					if (e[i + 1][j] == 0 && (a[i + 1][j] == 0 || a[i + 1][j] - u + o - 3 - c > 0 && a[i + 1][j] > 0))
+					if (e[i + 1][j] == 0 && (a[i + 1][j] == 0 ||
+											 a[i + 1][j] - u + o - 3 - c > 0 && a[i + 1][j] > 0))
 						e[i + 1][j] = o;
-					if (e[i - 1][j] == 0 && (a[i - 1][j] == 0 || a[i - 1][j] - u + o - 3 - c > 0 && a[i - 1][j] > 0))
+					if (e[i - 1][j] == 0 && (a[i - 1][j] == 0 ||
+											 a[i - 1][j] - u + o - 3 - c > 0 && a[i - 1][j] > 0))
 						e[i - 1][j] = o;
 					r = 1;
 				}
@@ -79,7 +103,7 @@ void neweat()
 		n = rand() % 21 + 3;
 		m = rand() % 78 + 1;
 		v++;
-		if (v == 1000)
+		if (v > 1000)
 		{
 			gotoxy(20, 6);
 			cout << "Congratulations";
@@ -119,29 +143,34 @@ int way()
 {
 	i = n;
 	j = m;
-	k = 0;
-	while (true)
+	K = -10;
+	while (i != y || j != x)
 	{
-		if (i == y && j == x)
-			return 1;
-		if (k > 1000)
-		{
-			return 0;
-		}
 		N = i;
 		M = j;
-		if (e[i][j + 1] + 1 == e[i][j])
-			j++;
-		else if (e[i][j - 1] + 1 == e[i][j])
-			j--;
-		else if (e[i + 1][j] + 1 == e[i][j])
-			i++;
-		else if (e[i - 1][j] + 1 == e[i][j])
+		if (e[i][j] - e[i - 1][j] == 1 && a[i - 3][j] != -1)
 			i--;
-		e[N][M] = -10;
-		k++;
+		else if (e[i][j] - e[i + 1][j] == 1 && a[i + 3][j] != -1)
+			i++;
+		else if (e[i][j] - e[i][j - 1] == 1 && a[i][j - 3] != -1)
+			j--;
+		else if (e[i][j] - e[i][j + 1] == 1 && a[i][j + 3] != -1)
+			j++;
+		else if (e[i][j] - e[i - 1][j] == 1)
+			i--;
+		else if (e[i][j] - e[i + 1][j] == 1)
+			i++;
+		else if (e[i][j] - e[i][j - 1] == 1)
+			j--;
+		else if (e[i][j] - e[i][j + 1] == 1)
+			j++;
+		else
+			return 0;
+		e[N][M] = K;
+		K--;
 	}
-	e[i][j] = -10;
+	e[i][j] = K;
+	return 1;
 }
 
 void drawe()
@@ -152,7 +181,7 @@ void drawe()
 			gotoxy(j, i);
 			if (e[i][j] == -10)
 				cout << "@";
-			else if (e[i][j] != -1)
+			else if (e[i][j] < 0)
 				cout << alf[e[i][j] % (alf.length() + 1)];
 		}
 	gotoxy(m, n);
@@ -177,8 +206,49 @@ void bot()
 	zero(1);
 	e[y][x] = 1;
 	voln();
-	if (way() == 0)
-		bf = s = 0;
+	if (!way())
+		bf = s = 0, ps = 1;
+}
+
+int spps()
+{
+	gotoxy(x, y);
+	pause();
+	b = _getch();
+	if (b == 109)
+	{
+		gotoxy(m, n);
+		cout << " ";
+		neweat();
+		gotoxy(x, y);
+		if (bf)
+			bot();
+		pause();
+		if (b == 109)
+			spps();
+	}
+	if (b == 32)
+		return 1;
+	else
+		return 0;
+}
+
+void pps()
+{
+	gotoxy(x, y);
+	cout << pshead;
+	if (R)
+		gotoxy(x, y);
+	else
+		gotoxy(0, 0);
+	pause();
+	b = _getch();
+	if (b == 32)
+	{
+		R = 1;
+		pps();
+	}
+	R = 0;
 }
 
 void ln(int k)
@@ -198,29 +268,28 @@ int Abs(int a)
 
 int main()
 {
-
-	SetConsoleTitle("Snke 1.1");
+	system("title Snke 1.2");
 	srand(t = time(NULL));
 	buffersize(80, 40);
 
 	out.open("readme.txt");
-	out << "Snke 1.1\nФайл справки\n\nУправление:\nКлавиши вверх, вправо, вниз, влево изменяют направление движения\nЕсли клавиша зажата по направлению движения, включается режим ускорения\n/ - режим удлинения\nb - автоматический режим\nv - суперускорение\n\nВерхняя панель:\n1. Длина\n2. Координаты головы\n3. Направление\n4. Координаты еды\n5. Расстояние до еды\n6. Координаты хвоста\n7. Шаги\n8. Двойная горизонтальная линия - режим ускорения; вертикальные линии - автоматический режим; горизонтальная линия - суперускорение\n9. Время\n10. Расстояние до еды в обход стенам\n11. Название карты\n12. Рекордная длина\n\nФайлы:\nreadme.txt\n	Файл справки\nconfig.txt\n	1. Начальная абцисса головы\n	2. Начальная ордината головы\n	3. Начальная длина\n	4. Начальное направление\n	5. Если 0, то удлинение выключено\n	6. Стандартная задержка\n	7. Задержка режима ускорения\n	8. Задержка суперускорения\n	9. Символ головы\n	10. Символ еды\n	11. Имя файла карты\nhighscore.txt\n	Рекордная длина\ndefault.map\n	Файл карты\n	21 строк, 78 столбцов\n	Если указана 1, то в соответсвующем месте на игровом поле стена";
+	out << "Snke 1.2\n17.06.2015\nФайл справки\n\nУправление:\nКлавиши вверх, вправо, вниз, влево изменяют направление движения\nЕсли клавиша зажата по направлению движения, включается режим ускорения\n/ - режим удлинения\nb - автоматический режим\nv - суперускорение\nn - пошаговый режим\nm - новая еда\nпробел - пауза\n\nВерхняя панель:\n1. Длина\n2. Координаты головы\n3. Направление\n4. Координаты еды\n5. Расстояние до еды\n6. Координаты хвоста\n7. Шаги\n8. Двойная горизонтальная линия - режим ускорения; вертикальные линии - автоматический режим; горизонтальная линия - суперускорение\n9. Время\n10. Расстояние до еды в обход стенам\n11. Название карты\n12. Рекордная длина\n\nФайлы:\nreadme.txt\n	Файл справки\nconfig.txt\n	1. Начальная абцисса головы\n	2. Начальная ордината головы\n	3. Начальная длина\n	4. Начальное направление\n	5. Если 0, то удлинение выключено\n	6. Стандартная задержка\n	7. Задержка режима ускорения\n	8. Задержка суперускорения\n	9. Символ головы\n	10. Символ головы в пошаговом режиме \n	11. Символ еды\n	12. Имя файла карты\nhighscore.txt\n	Рекордная длина\ndefault.map\n	Файл карты\n	21 строк, 78 столбцов\n	Если указана 1, то в соответсвующем месте на игровом поле стена";
 	out.close();
 
 	config.open("config.txt");
 	if (config)
 	{
-		config >> x >> y >> l >> dir >> sm >> slp >> slpf >> slps >> head >> eat >> map;
+		config >> x >> y >> l >> dir >> sm >> slp >> slpf >> slps >> head >> pshead >> eat >> map;
 		config.close();
 	}
 	else
 	{
 		config.close();
 		out.open("config.txt");
-		out << "40 11 5 2 1 400 25 0 O $ default.map";
+		out << "40 11 5 2 1 250 25 0 O 0 $ default.map";
 		out.close();
 		conf.open("config.txt");
-		conf >> x >> y >> l >> dir >> sm >> slp >> slpf >> slps >> head >> eat >> map;
+		conf >> x >> y >> l >> dir >> sm >> slp >> slpf >> slps >> head >> pshead >> eat >> map;
 		conf.close();
 	}
 	high.open("highscore.txt");
@@ -273,7 +342,7 @@ int main()
 	w = x;
 	q = y;
 	u = 10;
-	//alf = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+	alf = " 123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
 	for (i = 0; i < 25; i++)
 		for (j = 0; j < 80; j++)
@@ -341,48 +410,10 @@ int main()
 	ln(61);
 	ln(73);
 	buffersize(80, 25);
-
 	neweat();
 
 	while (true)
 	{
-
-		gotoxy(1, 1);
-		cout.width(4);
-		cout << c;
-		gotoxy(8, 1);
-		cout.width(2);
-		cout << x << " ";
-		cout.width(2);
-		cout << y - 2;
-		gotoxy(16, 1);
-		cout << dir;
-		gotoxy(22, 1);
-		cout.width(2);
-		cout << m << " ";
-		cout.width(2);
-		cout << n - 2;
-		gotoxy(29, 1);
-		cout.width(3);
-		cout << Abs(y - n) + Abs(x - m);
-		gotoxy(35, 1);
-		cout.width(2);
-		cout << X << " ";
-		cout.width(2);
-		cout << Y - 2;
-		gotoxy(42, 1);
-		cout.width(4);
-		cout << C;
-		gotoxy(51, 1);
-		cout.width(4);
-		cout << time(NULL) - t;
-		gotoxy(74, 1);
-		cout.width(4);
-		cout << (h = max(h, c));
-		gotoxy(57, 1);
-		cout.width(3);
-		cout << z[y][x];
-
 		gotoxy(18, 1);
 		if (dir == 1)
 		{
@@ -423,13 +454,14 @@ int main()
 			gotoxy(X, Y);
 			cout << " ";
 			a[Y][X] = 0;
-			if (a[Y - 1][X] == max(max(a[Y - 1][X], a[Y][X + 1]), max(a[Y + 1][X], a[Y][X - 1])))
+			MaX = max(max(a[Y - 1][X], a[Y][X + 1]), max(a[Y + 1][X], a[Y][X - 1]));
+			if (a[Y - 1][X] == MaX)
 				Y--;
-			else if (a[Y][X + 1] == max(max(a[Y - 1][X], a[Y][X + 1]), max(a[Y + 1][X], a[Y][X - 1])))
+			else if (a[Y][X + 1] == MaX)
 				X++;
-			else if (a[Y + 1][X] == max(max(a[Y - 1][X], a[Y][X + 1]), max(a[Y + 1][X], a[Y][X - 1])))
+			else if (a[Y + 1][X] == MaX)
 				Y++;
-			else if (a[Y][X - 1] == max(max(a[Y - 1][X], a[Y][X + 1]), max(a[Y + 1][X], a[Y][X - 1])))
+			else if (a[Y][X - 1] == MaX)
 				X--;
 		}
 		F = 0;
@@ -466,20 +498,69 @@ int main()
 		else if (Abs(a[q][w - 1] - a[q][w]) == 1 &&
 				 Abs(a[q][w] - a[q - 1][w]) == 1)
 			cout << char(0xD9);
-		w = x; q = y;
+		w = x;
+		q = y;
 
 		if (brk)
 			break;
 
 		gotoxy(x, y);
-		cout << head;
+		if (ps)
+			cout << pshead;
+		else
+			cout << head;
 
 		for (i = 1; i < 24; i++)
+		{
 			for (j = 1; j < 79; j++)
+			{
 				if (a[i][j] > 0)
 					a[i][j]++;
+			}
+		}
 
-		if (f)
+		gotoxy(1, 1);
+		cout.width(4);
+		cout << c;
+		gotoxy(8, 1);
+		cout.width(2);
+		cout << x << " ";
+		cout.width(2);
+		cout << y - 2;
+		gotoxy(16, 1);
+		cout << dir;
+		gotoxy(22, 1);
+		cout.width(2);
+		cout << m << " ";
+		cout.width(2);
+		cout << n - 2;
+		gotoxy(29, 1);
+		cout.width(3);
+		cout << Abs(y - n) + Abs(x - m);
+		gotoxy(35, 1);
+		cout.width(2);
+		cout << X << " ";
+		cout.width(2);
+		cout << Y - 2;
+		gotoxy(42, 1);
+		cout.width(4);
+		cout << C;
+		gotoxy(51, 1);
+		cout.width(4);
+		cout << time(NULL) - t;
+		gotoxy(74, 1);
+		cout.width(4);
+		cout << (h = max(h, c));
+		gotoxy(57, 1);
+		cout.width(3);
+		cout << z[y][x] - 1;
+
+		if (ps)
+		{
+			gotoxy(0, 0);
+			pause();
+		}
+		else if (f)
 			Sleep(slpf);
 		else if (s)
 			Sleep(slps);
@@ -489,17 +570,22 @@ int main()
 		f = 0;
 		while (_kbhit())
 		{
-			b = getch();
-			if (b == 47 || b == 46)
+			b = _getch();
+			if (b == ' ')
 			{
-				if (g == 1)
+				if (spps())
+					break;
+			}
+			if (b == '/' || b == '.')
+			{
+				if (g)
 					g = 0;
 				else
 					g = 1;
 			}
-			if (b == 98 || b == -88)
+			if (b == 'b' || b == -88)
 			{
-				if (bf == 1)
+				if (bf)
 					bf = s = 0;
 				else
 				{
@@ -513,9 +599,9 @@ int main()
 					bot();
 				}
 			}
-			if (b == 118 || b == -84)
+			if (b == 'v' || b == -84)
 			{
-				if (s == 1)
+				if (s)
 					s = 0;
 				else
 				{
@@ -530,6 +616,26 @@ int main()
 						cout << char(0xCF) << char(0xCF);
 					}
 				}
+			}
+			if (b == 'n' || b == -30)
+			{
+				if (ps)
+					ps = 0;
+				else
+				{
+					ps = 1;
+					pps();
+				}
+				if (b == 'n' || b == -30 || b == ' ')
+					ps = 0;
+			}
+			if (b == 'm' || b == -20)
+			{
+				gotoxy(m, n);
+				cout << " ";
+				neweat();
+				if (bf)
+					bot();
 			}
 			if (b == 75 && bf == 0)
 			{
@@ -565,40 +671,39 @@ int main()
 			}
 		}
 
-		if (bf == 1)
+
+		if (bf)
 		{
-			if (e[y - 1][x] == -10)
+			K++;
+			if (e[y - 1][x] == K)
 			{
 				if (dir == 3)
-					bf = s = 0;
+					bf = s = 0, ps = 1;
 				else
 					dir = 1;
 			}
-			if (e[y][x + 1] == -10)
+			if (e[y][x + 1] == K)
 			{
 				if (dir == 4)
-					bf = s = 0;
+					bf = s = 0, ps = 1;
 				else
 					dir = 2;
 			}
-			if (e[y + 1][x] == -10)
+			if (e[y + 1][x] == K)
 			{
 				if (dir == 1)
-					bf = s = 0;
+					bf = s = 0, ps = 1;
 				else
 					dir = 3;
 			}
-			if (e[y][x - 1] == -10)
+			if (e[y][x - 1] == K)
 			{
 				if (dir == 2)
-					bf = s = 0;
+					bf = s = 0, ps = 1;
 				else
 					dir = 4;
 			}
-			if (e[y][x] == -10)
-				e[y][x] = -12;
 		}
-
 
 		if (f)
 		{
@@ -609,7 +714,7 @@ int main()
 			gotoxy(48, 2);
 			cout << char(0xCD) << char(0xCD);
 		}
-		else if (bf == 1 && s == 0)
+		else if (bf && !s)
 		{
 			gotoxy(48, 0);
 			cout << char(0xD1) << char(0xD1);
@@ -618,7 +723,7 @@ int main()
 			gotoxy(48, 2);
 			cout << char(0xCF) << char(0xCF);
 		}
-		else if (bf == 0 && s == 0)
+		else if (!bf && !s)
 		{
 			gotoxy(48, 0);
 			cout << char(0xCD) << char(0xCD);
@@ -635,7 +740,7 @@ int main()
 	out.close();
 
 	gotoxy(x, y);
-	if (v == 1000)
+	if (v > 1000)
 		cout << "$";
 	else
 		cout << char(0xB2);
