@@ -336,12 +336,26 @@ int main()
 	}
 	mp.close();
 
-	y += 2;
-	X = x - l + 1;
+	int oldX = x, oldY = y;
+
+	newgame:;
+
+	for (i = 3; i < 24; i++)
+	{
+		for (j = 1; j < 79; j++)
+		{
+			a[i][j] = 0;
+		}
+	}
+
+	y = oldY + 2;
+	x = oldX;
+	X = oldX - l + 1;
 	Y = y;
 	w = x;
 	q = y;
 	u = 10;
+	brk = 0;
 	alf = " 123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
 	for (i = 0; i < 25; i++)
@@ -350,13 +364,14 @@ int main()
 			if (i == 0 || i == 2 || i == 24 ||
 				j == 0 || j == 79)
 				a[i][j] = e[i][j] = z[i][j] = -1;
-			if (a[i][j] == -1)
-			{
-				gotoxy(j, i);
-				cout << char(0xDB);
-			}
+			//if (a[i][j] == -1)
+			//{
+			//	gotoxy(j, i);
+			//	cout << char(0xDB);
+			//}
 		}
 
+	c = 0;
 	for (i = x; i >= X; i--)
 	{
 		a[y][i] = u + 2 + c++;
@@ -745,6 +760,9 @@ int main()
 	else
 		cout << char(0xB2);
 	gotoxy(20, 4);
+
+	goto newgame;
+
 	system("pause");
 
 	return 0;
