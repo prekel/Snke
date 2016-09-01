@@ -338,32 +338,6 @@ int main()
 
 	int oldX = x, oldY = y;
 
-	newgame:;
-
-	for (i = 3; i < 24; i++)
-	{
-		for (j = 1; j < 79; j++)
-		{
-			if (a[i][j] != 0)
-			{
-				gotoxy(j, i);
-				cout << " ";
-			}
-			a[i][j] = 0;
-		}
-	}
-
-	y = oldY + 2;
-	x = oldX;
-	X = oldX - l + 1;
-	Y = y;
-	w = x;
-	q = y;
-	u = 10;
-	brk = 0;
-	dir = 2;
-	alf = " 123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-
 	for (i = 0; i < 25; i++)
 		for (j = 0; j < 80; j++)
 		{
@@ -377,13 +351,6 @@ int main()
 			//}
 		}
 
-	c = 0;
-	for (i = x; i >= X; i--)
-	{
-		a[y][i] = u + 2 + c++;
-		gotoxy(i, y);
-		cout << char(0xC4);
-	}
 
 	gotoxy(0, 24);
 	for (i = 0; i < 80; i++)
@@ -432,6 +399,41 @@ int main()
 	ln(73);
 	buffersize(80, 25);
 	neweat();
+
+	newgame:;
+
+	for (i = 3; i < 24; i++)
+	{
+		for (j = 1; j < 79; j++)
+		{
+			if (a[i][j] != 0)
+			{
+				gotoxy(j, i);
+				cout << " ";
+			}
+			a[i][j] = 0;
+		}
+	}
+
+	y = oldY + 2;
+	x = oldX;
+	X = oldX - l + 1;
+	Y = y;
+	w = x;
+	q = y;
+	u = 10;
+	brk = 0;
+	dir = 2;
+	//alf = " 123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+
+
+	c = 0;
+	for (i = x; i >= X; i--)
+	{
+		a[y][i] = u + 2 + c++;
+		gotoxy(i, y);
+		cout << char(0xC4);
+	}
 
 	while (true)
 	{
