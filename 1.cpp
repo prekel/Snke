@@ -345,6 +345,8 @@ int main()
 		for (j = 1; j < 79; j++)
 		{
 			a[i][j] = 0;
+			gotoxy(j, i);
+			cout << " ";
 		}
 	}
 
