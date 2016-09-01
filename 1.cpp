@@ -344,9 +344,12 @@ int main()
 	{
 		for (j = 1; j < 79; j++)
 		{
+			if (a[i][j] != 0)
+			{
+				gotoxy(j, i);
+				cout << " ";
+			}
 			a[i][j] = 0;
-			gotoxy(j, i);
-			cout << " ";
 		}
 	}
 
@@ -358,6 +361,7 @@ int main()
 	q = y;
 	u = 10;
 	brk = 0;
+	dir = 2;
 	alf = " 123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
 	for (i = 0; i < 25; i++)
